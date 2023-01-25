@@ -6,8 +6,6 @@ s21_DECIMAL_C = functions/*.c
 s21_DECIMAL_O = s21_*.o
 S21_SUITE_C = tests/*.c
 S21_SUITE_O = suite_*.o
-TG_TEST_C = tg_tests/test_*.c
-TG_TEST_O = test_*.o
 
 all: clean test
 
