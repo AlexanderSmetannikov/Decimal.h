@@ -1,6 +1,6 @@
 #include "../s21_decimal.h"
 
-int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   short err = 0, sign_1 = get_sign(value_1.bits[3]),
         sign_2 = get_sign(value_2.bits[3]);
   unsigned int scale = 0;
@@ -14,8 +14,6 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   value_2.bits[3] = reset_bit(value_2.bits[3], 31);
   scale = reset_bit(scale, 31);
   if (!sign_1 && !sign_2) {
-    overflow_add(val_1, val_2, &res);
-  } else if (!sign_1 && sign_2) {
     if (s21_is_less(value_1, value_2)) {
       s21_sub_bin_overflow(val_2, val_1, &res);
       scale |= MINUS;
@@ -23,15 +21,17 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
       s21_sub_bin_overflow(val_1, val_2, &res);
     }
   } else if (sign_1 && !sign_2) {
+    overflow_add(val_1, val_2, &res);
+    scale |= MINUS;
+  } else if (!sign_1 && sign_2) {
+    overflow_add(val_1, val_2, &res);
+  } else {
     if (s21_is_greater(value_1, value_2)) {
       s21_sub_bin_overflow(val_1, val_2, &res);
       scale |= MINUS;
     } else if (!s21_is_equal(value_1, value_2)) {
       s21_sub_bin_overflow(val_2, val_1, &res);
     }
-  } else {
-    overflow_add(val_1, val_2, &res);
-    scale |= MINUS;
   }
   err = check_max(res, scale);
   if (result) {
